@@ -4,11 +4,11 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using WindowsAzure.Acs.Oauth2.Client;
 using Microsoft.AspNet.SignalR.Client.Hubs;
 using Microsoft.AspNet.SignalR.Client.Transports;
 using Microsoft.ServiceBus.Messaging;
 using Newtonsoft.Json;
+using RestSharp;
 
 namespace Gateway
 {
@@ -22,18 +22,14 @@ namespace Gateway
 
             Console.WriteLine("Connected to amqp");
 
-            var client = new SimpleOAuth2Client(
-                new Uri(ConfigurationSettings.AuthorizationServer),
-                new Uri(ConfigurationSettings.AuthenticationServer),
+            var header = GetAuthorizationHeader(
+                ConfigurationSettings.BaseUri,
                 ConfigurationSettings.ClientId,
                 ConfigurationSettings.ClientSecret,
-                ConfigurationSettings.Scope,
-                new Uri(ConfigurationSettings.RedirectUri), 
-                ClientMode.TwoLegged);
+                ConfigurationSettings.Scope
+                );
 
-            client.Authorize();
-
-            ConnectToSignalr(client);
+            ConnectToSignalr(header);
             
             Console.WriteLine("Connected to the signalr endpoint");
             
@@ -66,6 +62,23 @@ namespace Gateway
                     Toggle(Port);
                 }
             }
+        }
+
+        private static string GetAuthorizationHeader(string baseuri, string clientId, string clientSecret, string scope)
+        {
+            var client = new RestClient(baseuri);
+
+            var request = new RestRequest("authorize", Method.POST);
+            request.AddParameter("client_id", clientId);
+            request.AddParameter("client_secret", clientSecret);
+            request.AddParameter("scope", scope);
+            request.AddParameter("grant_type", "client_credentials");
+
+            var response = client.Execute(request);
+
+            string token = JsonConvert.DeserializeObject<dynamic>(response.Content).access_token;
+
+            return "Bearer " + Convert.ToBase64String(Encoding.UTF8.GetBytes(token));
         }
 
         private static void Toggle(SerialPort port)
@@ -136,11 +149,11 @@ namespace Gateway
             listenerThread.Start();
         }
 
-        private static void ConnectToSignalr(SimpleOAuth2Client client)
+        private static void ConnectToSignalr(string header)
         {
             var hubConnection = new HubConnection(ConfigurationSettings.SignalrEndpoint);
 
-            hubConnection.Headers.Add(HttpRequestHeader.Authorization.ToString(), client.GetAccessToken());
+            hubConnection.Headers.Add(HttpRequestHeader.Authorization.ToString(), header);
 
             _channelHubProxy = hubConnection.CreateHubProxy("ChannelHub");
 
