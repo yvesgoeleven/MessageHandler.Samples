@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Resources;
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Navigation;
-using WindowsAzure.Acs.Oauth2.Client;
-using WindowsAzure.Acs.Oauth2.Client.WinRT;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using PhoneApp1.Resources;
@@ -58,31 +55,20 @@ namespace PhoneApp1
             }
         }
 
-        public static SimpleOAuth2Client OauthClient = new SimpleOAuth2Client(
-            new Uri(ConfigurationSettings.AuthorizationServer),
-            new Uri(ConfigurationSettings.AuthenticationServer),
-            ConfigurationSettings.ClientId,
-            ConfigurationSettings.ClientSecret,
-            ConfigurationSettings.Scope, 
-            new Uri(ConfigurationSettings.RedirectUri), 
-            ClientMode.TwoLegged);
-
         public static SignalrClient Signalr = new SignalrClient();
 
         // Code to execute when the application is launching (eg, from Start)
         // This code will not execute when the application is reactivated
         private async void Application_Launching(object sender, LaunchingEventArgs e)
         {
-           await OauthClient.AuthorizeAsync();
-
-           await Signalr.ListenForTemperatureChanges(OauthClient);
+           await Signalr.ListenForTemperatureChanges();
         }
 
         // Code to execute when the application is activated (brought to foreground)
         // This code will not execute when the application is first launched
         private async void Application_Activated(object sender, ActivatedEventArgs e)
         {
-            await Signalr.ListenForTemperatureChanges(OauthClient);
+            await Signalr.ListenForTemperatureChanges();
         }
 
         // Code to execute when the application is deactivated (sent to background)

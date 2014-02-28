@@ -65,10 +65,7 @@
                             Unit="Temperature"
                             Margin="0 0 5 10"
                             Grid.Row="0"/>
-
-            <Button Grid.Row="1" Click="Button_Click">
-                Toggle
-            </Button>
+           
         </Grid>
 
         <!--Uncomment to see an alignment grid to help ensure your controls are

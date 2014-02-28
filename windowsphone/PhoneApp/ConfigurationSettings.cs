@@ -6,20 +6,14 @@
 
     public class ConfigurationSettings
     {
+        public const string BaseUri = "http://api.messagehandler.net";
         public const string ClientId = "";
         public const string ClientSecret = "";
-        public const string RedirectUri = "";
-        public const string Scope = "";
-        public const string AuthenticationServer = "";
-        public const string AuthorizationServer = "";
+        public const string Scope = "http://api.messagehandler.net/";
 
-        public const string ApiRoot = "";
-        public const string QueueName = "";
+        public const string SignalrEndpoint = "http://api.messagehandler.net/signalr/";
 
-        public const string SignalrEndpoint = "";
-
-        public const string TemperaturesChannel = "";
-        public const string RoutingChannel = "";
+        public const string Channel = "";
         public const string Environment = "";
 
     }

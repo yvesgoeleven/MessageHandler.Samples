@@ -1,21 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
-using WindowsAzure.Acs.Oauth2.Client.WinRT;
+using Microsoft.AspNet.SignalR.Client;
 using Microsoft.AspNet.SignalR.Client.Hubs;
 using Microsoft.AspNet.SignalR.Client.Transports;
+using Newtonsoft.Json.Linq;
+using RestSharp;
 
 namespace PhoneApp1
 {
     public class SignalrClient
     {
-        public async Task ListenForTemperatureChanges(SimpleOAuth2Client client)
+        public async Task ListenForTemperatureChanges()
         {
+            var header = await _authorization.GetAuthorizationHeader();
+
             var hubConnection = new HubConnection(ConfigurationSettings.SignalrEndpoint, 
                                    new Dictionary<string, string>
                                    {
-                                       { HttpRequestHeader.Authorization.ToString(), await client.GetAccessToken() }
+                                       { HttpRequestHeader.Authorization.ToString(), header }
                                    });
+
+            hubConnection.EnsureReconnecting();
 
             _channelHubProxy = hubConnection.CreateHubProxy("ChannelHub");
 
@@ -24,22 +32,15 @@ namespace PhoneApp1
 
             await hubConnection.Start(new LongPollingTransport());
 
-            await _channelHubProxy.Invoke("Subscribe", ConfigurationSettings.TemperaturesChannel, ConfigurationSettings.Environment);
+            await _channelHubProxy.Invoke("Subscribe", ConfigurationSettings.Channel, ConfigurationSettings.Environment);
         }
 
         private static void UpdateTemperatureView(dynamic msg)
         {
-            ViewModel.Temperature.Current = msg.Amount;
+            ViewModel.Temperature.Current = msg["Amount"].Value;
         }
-
-        public async Task Send(ToggleCommand toggleCommand)
-        {
-            await _channelHubProxy.Invoke("Publish", ConfigurationSettings.RoutingChannel, ConfigurationSettings.Environment, toggleCommand);
-        }
-
     
         private static IHubProxy _channelHubProxy;
-
-
+        private readonly Authorization _authorization = new Authorization();
     }
 }
