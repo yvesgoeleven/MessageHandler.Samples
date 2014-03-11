@@ -26,6 +26,7 @@ namespace PhoneApp1
             hubConnection.Reconnecting += async () => 
             {
                 header = await _authorization.GetAuthorizationHeader();
+                hubConnection.Headers[HttpRequestHeader.Authorization.ToString()] = header;
             };
 
             _channelHubProxy = hubConnection.CreateHubProxy(endpoint.Hub);
