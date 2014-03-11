@@ -8,7 +8,7 @@ namespace PhoneApp1
 {
     public class EndpointRequest
     {
-        public async Task<dynamic> GetEndpoint(string bearerToken, string protocol)
+        public async Task<Endpoint> GetEndpoint(string bearerToken, string protocol)
         {
             var client = new RestClient(ConfigurationSettings.BaseUri);
 
@@ -23,10 +23,20 @@ namespace PhoneApp1
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 var parsed = JObject.Parse(response.Content);
-                return parsed["address"].Value<string>();
+                return new Endpoint
+                {
+                    Address = parsed["address"].Value<string>(),
+                    Hub = parsed["hub"].Value<string>(),
+                };
             }
 
             return null;
         }
+    }
+
+    public class Endpoint
+    {
+        public string Address { get; set; }
+        public string Hub { get; set; }
     }
 }

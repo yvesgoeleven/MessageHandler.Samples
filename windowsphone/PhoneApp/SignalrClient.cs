@@ -16,7 +16,7 @@ namespace PhoneApp1
             var header = await _authorization.GetAuthorizationHeader();
             var endpoint = await _endpointRequest.GetEndpoint(header, "signalr");
 
-            var hubConnection = new HubConnection(endpoint, 
+            var hubConnection = new HubConnection(endpoint.Address, 
                                    new Dictionary<string, string>
                                    {
                                        { HttpRequestHeader.Authorization.ToString(), header }
@@ -28,7 +28,7 @@ namespace PhoneApp1
                 header = await _authorization.GetAuthorizationHeader();
             };
 
-            _channelHubProxy = hubConnection.CreateHubProxy("ChannelHub");
+            _channelHubProxy = hubConnection.CreateHubProxy(endpoint.Hub);
 
             _channelHubProxy.Subscribe("ReceiveMessage").Received +=
                list => App.RootFrame.Dispatcher.BeginInvoke(() => UpdateTemperatureView(list[0]));
