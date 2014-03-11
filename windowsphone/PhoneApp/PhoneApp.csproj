@@ -95,6 +95,7 @@
     </Compile>
     <Compile Include="Authorization.cs" />
     <Compile Include="ConfigurationSettings.cs" />
+    <Compile Include="EndpointRequest.cs" />
     <Compile Include="LocalizedStrings.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>

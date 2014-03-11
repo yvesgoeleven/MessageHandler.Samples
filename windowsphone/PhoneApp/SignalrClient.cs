@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Client;
 using Microsoft.AspNet.SignalR.Client.Hubs;
 using Microsoft.AspNet.SignalR.Client.Transports;
-using Newtonsoft.Json.Linq;
-using RestSharp;
 
 namespace PhoneApp1
 {
@@ -16,14 +14,19 @@ namespace PhoneApp1
         public async Task ListenForTemperatureChanges()
         {
             var header = await _authorization.GetAuthorizationHeader();
+            var endpoint = await _endpointRequest.GetEndpoint(header, "signalr");
 
-            var hubConnection = new HubConnection(ConfigurationSettings.SignalrEndpoint, 
+            var hubConnection = new HubConnection(endpoint, 
                                    new Dictionary<string, string>
                                    {
                                        { HttpRequestHeader.Authorization.ToString(), header }
                                    });
 
             hubConnection.EnsureReconnecting();
+            hubConnection.Reconnecting += async () => 
+            {
+                header = await _authorization.GetAuthorizationHeader();
+            };
 
             _channelHubProxy = hubConnection.CreateHubProxy("ChannelHub");
 
@@ -42,5 +45,6 @@ namespace PhoneApp1
     
         private static IHubProxy _channelHubProxy;
         private readonly Authorization _authorization = new Authorization();
+        private readonly EndpointRequest _endpointRequest = new EndpointRequest();
     }
 }

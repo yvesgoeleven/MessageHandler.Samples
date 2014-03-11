@@ -7,14 +7,12 @@
     public class ConfigurationSettings
     {
         public const string BaseUri = "http://api.messagehandler.net";
-        public const string ClientId = "";
-        public const string ClientSecret = "";
+        public const string ClientId = "XXXXXXX";
+        public const string ClientSecret = "XXXXXXXXXXXXXXXXX";
         public const string Scope = "http://api.messagehandler.net/";
 
-        public const string SignalrEndpoint = "http://api.messagehandler.net/signalr/";
-
-        public const string Channel = "";
-        public const string Environment = "";
+        public const string Channel = "XXXXXXXXXX";
+        public const string Environment = "XXXXXXXXXXx";
 
     }
 }
